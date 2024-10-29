@@ -1,23 +1,12 @@
 "use client";
 
-import Image from "next/image";
+import { api } from "@/convex/_generated/api";
+import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
-interface Message {
-  sender: string;
-  content: string;
-}
 
 export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      sender: "Alice",
-      content: "Hello, Bob!",
-    },
-    {
-      sender: "Bob",
-      content: "Hello, Alice!",
-    },
-  ]);
+  const messages = useQuery(api.functions.message.list);
+  const createMessage = useMutation(api.functions.message.create);
   // initialize input state
   const [input, setInput] = useState("");
 
@@ -25,13 +14,13 @@ export default function Home() {
     // prevent default form submission and use custom logic
     e.preventDefault();
     // add new message to messages
-    setMessages([...messages, { sender: "Alice", content: input }]);
+    createMessage({ sender: "user", content: input });
     // clear input
     setInput("");
   };
   return (
     <div>
-      {messages.map((message, index) => (
+      {messages?.map((message, index) => (
         // will later be indexed by data
         <div key={index}>
           <strong>{message.sender}:</strong>
